@@ -1,5 +1,5 @@
 import React, { lazy } from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import type { RouteObject } from "react-router-dom";
 import {
   CopyOutlined,
@@ -37,6 +37,10 @@ declare module "react-router" {
 }
 
 export const routes: RouteObject[] = [
+  {
+    path: "/",
+    element: React.createElement(Navigate, { to: "/sign" }),
+  },
   {
     path: "/",
     element: React.createElement(BeforeEach, null, React.createElement(Home)),

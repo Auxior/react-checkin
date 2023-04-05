@@ -1,9 +1,7 @@
 import React from "react";
 import styles from "./Login.module.scss";
 import { Button, message, Form, Input, Row, Col } from "antd";
-import { useSelector } from "react-redux";
 import { useAppDispatch } from "../../store";
-import type { RootState } from "../../store";
 import { loginAction, updateToken } from "../../store/modules/users";
 import classNames from "classnames";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +24,6 @@ const testUsers: User[] = [
 
 export default function Login() {
   const navigate = useNavigate();
-  const token = useSelector((state: RootState) => state.users.token);
   const dispatch = useAppDispatch();
   const [form] = Form.useForm();
   const onFinish = (values: User) => {
