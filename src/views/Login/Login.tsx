@@ -6,6 +6,7 @@ import { useAppDispatch } from "../../store";
 import type { RootState } from "../../store";
 import { loginAction, updateToken } from "../../store/modules/users";
 import classNames from "classnames";
+import { useNavigate } from "react-router-dom";
 
 interface User {
   email: string;
@@ -24,31 +25,32 @@ const testUsers: User[] = [
 ];
 
 export default function Login() {
+  const navigate = useNavigate();
   const token = useSelector((state: RootState) => state.users.token);
   const dispatch = useAppDispatch();
-  const handleLogin = () => {
-    dispatch(loginAction({ email: "testA@iswd.top", pass: "testA" })).then(
-      (action) => {
-        const { errcode, token } = (
-          action.payload as { [index: string]: unknown }
-        ).data as { [index: string]: unknown };
-        if (errcode === 0 && typeof token === "string") {
-          dispatch(updateToken(token));
-          message.success("登录成功");
-        } else {
-          message.error("登录失败");
-        }
+  const [form] = Form.useForm();
+  const onFinish = (values: User) => {
+    dispatch(loginAction(values)).then((action) => {
+      const { errcode, token } = (
+        action.payload as { [index: string]: unknown }
+      ).data as { [index: string]: unknown };
+      if (errcode === 0 && typeof token === "string") {
+        dispatch(updateToken(token));
+        message.success("登录成功");
+        navigate("/");
+      } else {
+        message.error("登录失败");
       }
-    );
+    });
   };
-  const onFinish = (values: any) => {
-    console.log("Success:", values);
+  const onFinishFailed = ({ values }: { values: User }) => {
+    console.log("Failed:", values);
   };
-  const onFinishFailed = (errorInfo: any) => {
-    console.log("Failed:", errorInfo);
-  };
-  const autoLogin = (user: User) => {
-    return () => {};
+  const autoLogin = (values: User) => {
+    return () => {
+      form.setFieldsValue(values);
+      onFinish(values);
+    };
   };
 
   return (
@@ -83,11 +85,15 @@ export default function Login() {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
         className={styles.main}
+        form={form}
       >
         <Form.Item
           label="邮箱"
           name="email"
-          rules={[{ required: true, message: "请输入邮箱" }]}
+          rules={[
+            { required: true, message: "请输入邮箱" },
+            { type: "email", message: "请输入正确的邮箱地址" },
+          ]}
         >
           <Input placeholder="请输入邮箱" />
         </Form.Item>
